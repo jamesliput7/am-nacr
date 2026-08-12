@@ -2658,7 +2658,9 @@ html:not(.motion-js) .dg-hov:hover{transform:scale(1.02)}
 .slide--sched .dg-kd-name{font-size:var(--fs-s)}
 .slide--sched .dg-kd-weeks{font-size:var(--fs-floor)}
 .slide--sched .dg-kd-rfq{font-size:var(--fs-s)}
-.slide--sched .dg-kd-gates{grid-column:1/-1;padding:16px 20px}
+.slide--sched .dg-kd-gates{grid-column:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px 16px}
+.slide--sched .dg-kd-gate{align-items:flex-start;gap:8px}
+.slide--sched .dg-kd-gate b{margin-top:-2px}
 .slide--sched .dg-kd-gate b{width:34px;height:34px;font-size:var(--fs-floor)}
 .slide--sched .dg-kd-gate span{font-size:var(--fs-floor)}
 .slide--sched .fig-cap{margin-top:0;padding-bottom:4px}
@@ -3293,10 +3295,10 @@ html.motion-js .progress__fill{transition:none}
       <div class="dg-box dg-hov dg-center dg-box--royal"><div class="dg-title">The delivery pod</div><div class="dg-sub">2 Solution Architects + 2 support &middot; platform capability delivered as priced modules</div></div>
     </div>
     <div class="dg-kd-gates dg-hov">
-      <div class="dg-kd-gate"><b>M1</b><span><em>~WK 2</em>data in and structured</span></div>
-      <div class="dg-kd-gate"><b>M2</b><span><em>~WK 3</em>mapping ratified, checks pass</span></div>
-      <div class="dg-kd-gate"><b>M3</b><span><em>~WK 4</em>working flow, demonstrated</span></div>
-      <div class="dg-kd-gate"><b>M4</b><span><em>~WK 4</em>Engage 2.0 scope &amp; roadmap</span></div>
+      <div class="dg-kd-gate"><b>M1</b><span><em>~WK 2</em>data in, structured</span></div>
+      <div class="dg-kd-gate"><b>M2</b><span><em>~WK 3</em>mapping ratified</span></div>
+      <div class="dg-kd-gate"><b>M3</b><span><em>~WK 4</em>working flow</span></div>
+      <div class="dg-kd-gate"><b>M4</b><span><em>~WK 4</em>scope &amp; roadmap</span></div>
     </div>
   </div>
 </div></div></div>
