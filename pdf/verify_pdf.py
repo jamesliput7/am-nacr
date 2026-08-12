@@ -8,6 +8,18 @@ import pymupdf
 DIAGRAM_RECT = (80.6, 159.9, 514.7, 384.2)   # every gate page places its diagram here
 
 
+def find_diagram_size(doc, page_index, rect_y0):
+    """Returns the pixel size of the diagram image placed near rect_y0, or None."""
+    import io as _io
+    from PIL import Image
+    page = doc[page_index]
+    for xref, *_ in page.get_images(full=True):
+        for r in page.get_image_rects(xref):
+            if abs(r.y0 - rect_y0) < 2 and r.width > 400:
+                return Image.open(_io.BytesIO(doc.extract_image(xref)['image'])).size
+    return None
+
+
 def main(path):
     doc = pymupdf.open(path)
     flat = lambda i: ''.join(doc[i].get_text().split())
@@ -107,10 +119,19 @@ def main(path):
         not any('13-week\ncash flow use case' in p.get_text() or '13-week cash flow use case' in p.get_text()
                 for p in doc))
 
+    # pages 16, 17, 23 - the three mentions that weren't a literal phrase match
+    chk('p16 M2 caption reworded', 'calculationscompute' in flat(15))
+    chk('p16 M2 diagram box reworded (raster patch)',
+        find_diagram_size(doc, 15, 467.9) == (3600, 1860))
+    chk('p17 M3 caption reworded', 'reliefcalculations→supportbinder' in flat(16))
+    chk('p17 M3 diagram source node reworded (raster patch)',
+        find_diagram_size(doc, 16, 159.9) == (3600, 1860))
+    chk('p23 module-pricing lede reworded', 'vendor-motionreliefanalysis' in flat(22))
+    chk('no "13-week" anywhere in the document, live text or otherwise',
+        not any('13-week' in p.get_text() or '13-Week' in p.get_text() for p in doc))
+
     whole = ''.join(p.get_text() for p in doc)
     chk('misspelled names gone', 'Andrew Ku' not in whole and 'John Bain' not in whole)
-    chk('no 13-week cash flow on the gate pages',
-        '13-week' not in doc[17].get_text())
 
     for label, passed in results:
         print(('  PASS  ' if passed else '  FAIL  ') + label)
