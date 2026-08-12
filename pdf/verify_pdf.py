@@ -96,6 +96,17 @@ def main(path):
         ln['bbox'][3] for blk in doc[21].get_text('dict')['blocks']
         for ln in blk.get('lines', []) if ln['bbox'][3] < 800) < 760)
 
+    # pages 12, 13 (x2), 14, 21 - the remaining vendors-and-utilities rewording
+    chk('p12 Q8 answer reworded', 'VendorsandUtilities' in flat(11))
+    chk('p13 intro paragraph reworded', 'VendorsandUtilities' in flat(12))
+    chk('p13 Phase 1 box reworded and still has all three boxes',
+        'flowforVendorsandUtilities' in flat(12) and 'EngageRollout' in flat(12))
+    chk('p14 lede reworded', 'VendorsandUtilities' in flat(13))
+    chk('p21 Phase 1 bullet reworded', 'VendorsandUtilities' in flat(20))
+    chk('no "13-week cash flow use case" survives anywhere',
+        not any('13-week\ncash flow use case' in p.get_text() or '13-week cash flow use case' in p.get_text()
+                for p in doc))
+
     whole = ''.join(p.get_text() for p in doc)
     chk('misspelled names gone', 'Andrew Ku' not in whole and 'John Bain' not in whole)
     chk('no 13-week cash flow on the gate pages',
