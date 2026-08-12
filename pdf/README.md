@@ -24,8 +24,10 @@ Run `python3 verify_pdf.py` after building.
 
 ## Still to port from the HTML deck
 
-The vendors-and-utilities rewording (replacing the 13-week cash flow as the Phase 1
-motion) lands mid-paragraph and mid-table on pages 12, 13, 15, 16, 17, 21, 22, 23 and
-24, and the module catalogue row on page 24. Those pages would have to be re-authored
-in full. The Gantt chart on page 15 also needs a design decision: M4 falls in week 4
-alongside M3, so it has nowhere to sit on the existing gate lines.
+The vendors-and-utilities rewording still describes the 13-week cash flow as the
+Phase 1 motion on pages 12, 13, 14, 16, 17, 21, 22 and 23. Each instance sits
+mid-paragraph, so the surrounding text has to reflow; those pages would need
+re-authoring in full rather than an in-place edit.
+
+The Gantt chart on page 15 also needs a design decision before M4 can appear on it:
+M4 falls in week 4 alongside M3, so it has nowhere to sit on the existing gate lines.

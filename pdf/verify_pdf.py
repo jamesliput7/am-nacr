@@ -52,12 +52,15 @@ def main(path):
     # page 19 - proposed team
     names = [s['text'] for blk in doc[18].get_text('dict')['blocks']
              for ln in blk.get('lines', []) for s in ln['spans'] if abs(s['size'] - 13.0) < 0.2]
-    chk('p19 shows exactly the six expected cards',
-        names == ['Martyn Mason', 'Ruben Carrera', 'Andros Haggins',
-                  'Delivery Manager', 'Andrew Khoo', 'Jonathan Bain'])
+    chk('p19 shows all nine cards in order',
+        names == ['Martyn Mason', 'Ruben Carrera', 'Andros Haggins', 'Delivery Manager',
+                  'AI Engineer', 'Cloud Architect', 'QA Engineer',
+                  'Andrew Khoo', 'Jonathan Bain'])
     chk('p19 Ruben holds both titles', 'EngagementLead/SolutionArchitect' in flat(18))
-    chk('p19 has no Cloud Architect or QA card',
-        not [n for n in names if n in ('Cloud Architect', 'QA Engineer')])
+    chk('p19 bands its Phase 2 additions', 'ADDEDFORPHASE2' in flat(18).upper())
+    chk('p19 clears the footer', max(
+        ln['bbox'][3] for blk in doc[18].get_text('dict')['blocks']
+        for ln in blk.get('lines', []) if ln['bbox'][3] < 800) < 800)
 
     # page 20 - pod structure
     chk('p20 counts 4 then 6 roles', '4ROLES' in flat(19).upper() and '6ROLES' in flat(19).upper())
@@ -65,6 +68,19 @@ def main(path):
         flat(19).count('Carriedover') == 3 and flat(19).count('AddedforPhase2') == 3)
     chk('p20 lists the Phase 2 additions',
         all(r in flat(19) for r in ('AIEngineer', 'QualityAssurance', 'CloudArchitect')))
+    chk('p20 carries the also-at-the-table note',
+        'ALSOATTHETABLE' in flat(19).upper() and 'ruben.carrera@nymbl.app' in doc[19].get_text())
+
+    # page 24 - module sizing table
+    chk('p24 first module is vendors and utilities',
+        'VendorandUtilitiesFirst-DayMotions' in flat(23))
+    chk('p24 keeps the tier and sizing',
+        'Medium' in doc[23].get_text() and '~$200–275K' in doc[23].get_text())
+    chk('p24 what-sizes-it text replaced',
+        'Vendorresolution,thepre/post-petitionsplit' in flat(23)
+        and 'Twojoinscarryit' not in flat(23))
+    chk('no 13-week cash actuals anywhere',
+        '13-Week' not in ''.join(p.get_text() for p in doc))
 
     whole = ''.join(p.get_text() for p in doc)
     chk('misspelled names gone', 'Andrew Ku' not in whole and 'John Bain' not in whole)

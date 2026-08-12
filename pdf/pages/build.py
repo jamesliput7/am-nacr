@@ -96,6 +96,11 @@ def m4_gate(page_no):
 
 
 # ══ page B · Proposed Team (replaces the existing page) ════════════════════════
+# Four bands now, so the "also at the table" note moves to the pod-structure page:
+# a fourth band plus that note does not fit above the footer.
+JOIN_COL_W = (T.CARD_R - T.CARD_L - 2 * 7.0) / 3
+
+
 def proposed_team(page_no):
     els = T.chrome(page_no, '07', 'PROPOSED TEAM')
     els += T.title(['A lean, senior pod that', 'scales by track.'])
@@ -120,24 +125,25 @@ def proposed_team(page_no):
     els += text_card(T.CARD_L, T.CARD_R, 467.6, 69.1, ROYAL, 'Delivery Manager', 'TBD',
                      ['Sprint cadence, dependencies, and status against the Phase-1 gates.'], 'dm')
 
-    els += band(553.17, 'A&M · DAY-TO-DAY PRODUCT OWNERS', NAVY, 215.17, 'c')
-    els += avatar_card(T.CARD_L, T.COL_L_R, 561.5, NAVY, 'p18_252', 'Andrew Khoo',
+    els += band(553.17, 'ADDED FOR PHASE 2', ROYAL, None, 'j')
+    joiners = [
+        ('AI Engineer', ['Agent patterns, extraction and', 'drafting, and evaluation.']),
+        ('Cloud Architect', ['Azure infrastructure, isolation,', 'and AI routing.']),
+        ('QA Engineer', ['Accuracy and regression harness;', 'golden-case tests.']),
+    ]
+    for i, (name, bio) in enumerate(joiners):
+        x0 = T.CARD_L + i * (JOIN_COL_W + 7.0)
+        els += text_card(x0, x0 + JOIN_COL_W, 561.5, 81.6, ROYAL, name, 'TBD', bio, f'j{i}')
+
+    els += band(659.57, 'A&M · DAY-TO-DAY PRODUCT OWNERS', NAVY, 215.17, 'c')
+    els += avatar_card(T.CARD_L, T.COL_L_R, 667.9, NAVY, 'p18_252', 'Andrew Khoo',
                        'NACR · leading this initiative', NAVY,
                        ['Day-to-day product owner, setting priorities and',
                         'requirements with SME input.'], 'ak')
-    els += avatar_card(T.COL_R_L, T.CARD_R, 561.5, NAVY, 'p18_252', 'Jonathan Bain',
+    els += avatar_card(T.COL_R_L, T.CARD_R, 667.9, NAVY, 'p18_252', 'Jonathan Bain',
                        'Director', NAVY,
                        ['Day-to-day product owner alongside Andrew,',
                         'setting priorities and requirements.'], 'jb')
-
-    els += note(703.3, 'ALSO AT THE TABLE',
-                'A NACR Managing Director as executive sponsor and domain authority, and a '
-                'Technical Solutions Architect for architecture validation. The Phase-1 pod carries '
-                'into the Phase 2 rollout, joined there by an AI Engineer, a Cloud Architect, and '
-                'quality assurance; Solution Architects and specialists scale in per track after '
-                'that. Point of contact for this response: Ruben Carrera (ruben.carrera@nymbl.app). '
-                'The named team is available for the Stage-2 discovery sessions and can begin as '
-                'soon as an agreement is in place.', target_w=100.50)
     return R.render(els, OUT / 'proposed_team.pdf')
 
 
@@ -205,6 +211,18 @@ def pod_structure(page_no):
                 'the Technical Architect and Delivery Manager continue unchanged, so no one has to '
                 'relearn the domain between phases; the AI Engineer, quality assurance, and Cloud '
                 'Architect join for the production build. Phase 3 scales the same pod by track.')
+
+    els += [dict(id='alsolbl', kind='text', text='ALSO AT THE TABLE', font='Mont', weight=700,
+                 size=T.NOTE_LABEL_SIZE, color=ROYAL, baseline=598.0, x=T.MARGIN_L,
+                 ls=T.LS_NOTE, target_w=100.50),
+            dict(id='alsobody', kind='para', font='Ral', size=T.NOTE_SIZE, color=T.BIO_COLOR,
+                 baseline=598.0 + T.NOTE_LEAD, x=T.MARGIN_L, w=T.CONTENT_W, lead=T.NOTE_LEAD,
+                 text='A NACR Managing Director as executive sponsor and domain authority, and a '
+                      'Technical Solutions Architect for architecture validation. Solution '
+                      'Architects and specialists scale in per track after the build. Point of '
+                      'contact for this response: Ruben Carrera (ruben.carrera@nymbl.app). The '
+                      'named team is available for the Stage-2 discovery sessions and can begin as '
+                      'soon as an agreement is in place.')]
     return R.render(els, OUT / 'pod_structure.pdf')
 
 
