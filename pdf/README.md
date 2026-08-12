@@ -11,8 +11,12 @@ source was not available, so changes are made two ways:
   at the original sizes, colours and baselines.
 - **Authored pages**, where a change needs real layout: `pages/build.py` writes new
   pages in WeasyPrint 69.0 (same engine, same fonts, metrics measured off the
-  document) and `splice.py` inserts them, then fixes footer numbers, contents
-  references and bookmarks.
+  document). `splice.py` inserts new pages, then fixes footer numbers, contents
+  references and bookmarks; `replace_page.py` swaps one page for another of the same
+  size, leaving numbering alone.
+
+Deleting or replacing a page orphans its bookmark and any link that targeted it, so
+both scripts capture the outline first and repoint dead links afterwards.
 
 `pages/fonts/` holds the font subsets extracted from the PDF. They cover only the
 glyphs the document already uses, so `pages/render.py` refuses to render text with a
@@ -25,9 +29,9 @@ Run `python3 verify_pdf.py` after building.
 ## Still to port from the HTML deck
 
 The vendors-and-utilities rewording still describes the 13-week cash flow as the
-Phase 1 motion on pages 12, 13, 14, 16, 17, 21, 22 and 23. Each instance sits
-mid-paragraph, so the surrounding text has to reflow; those pages would need
-re-authoring in full rather than an in-place edit.
+Phase 1 motion on pages 12, 13, 14, 16, 17, 21 and 23. Each instance sits
+mid-paragraph, so the surrounding text has to reflow; like page 22, those pages need
+re-authoring rather than an in-place edit.
 
 The Gantt chart on page 15 also needs a design decision before M4 can appear on it:
 M4 falls in week 4 alongside M3, so it has nowhere to sit on the existing gate lines.

@@ -62,7 +62,11 @@ FACES = [   # (family, weight, style, filename)
     ('Ral', 700, 'normal', 'Raleway-Bold.ttf'),
     ('Ral', 800, 'normal', 'Raleway-Ultra-Bold.ttf'),
     ('Ral', 400, 'italic', 'Raleway-Oblique.ttf'),
+    # the source document sets its arrows in Arial because Raleway has no U+2192;
+    # declaring it after Ral in a font stack reproduces that fallback
+    ('Arw', 400, 'normal', 'Arial.ttf'),
 ]
+ARROW_STACK = 'Ral, Arw'
 
 
 def font_css():

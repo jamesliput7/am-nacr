@@ -226,7 +226,124 @@ def pod_structure(page_no):
     return R.render(els, OUT / 'pod_structure.pdf')
 
 
+# ══ page D · Indicative engagement structure ═══════════════════════════════════
+# Re-authored rather than patched: the new Phase 1 scope runs to ten lines where the
+# old text ran to seven, so row 1 grows 43.2pt and every row, rule and the caption
+# below it has to move. The table had the slack for it.
+COLS = (51.0, 134.5, 298.1, 364.3, 446.7, 544.3)
+STAGE_X, SCOPE_X, DUR_X, COMM_X, BUDGET_R = 61.0, 144.5, 308.1, 374.3, 534.3
+SCOPE_W, STAGE_LEAD, SCOPE_LEAD = 145.0, 12.75, 14.40
+ROW_PAD_TOP, ROW_PAD_BOT, VCENTRE = 20.34, 13.16, 3.39
+HEAD_RULE_Y, RULE_LW = 226.0, 0.75
+CELL_SIZE, STAGE_SIZE, HEAD_SIZE = 9.60, 8.50, 7.50
+RULE_LIGHT, RULE_HEAD = '#e4ebf4', '#001847'
+
+ROWS = [
+    (['Phase 1 ·', 'Discovery +', 'Build'],
+     'Compressed discovery that clears build scope and ships a live ingestion → mapping → '
+     'relief-calculation flow for the vendor and utilities motions — on your files in month one, '
+     'not a slide deck. Exits with an updated Engage 2.0 scope and a refined Platform '
+     'Development Roadmap.',
+     ['4 weeks'], ['Fixed fee'], '$60K'),
+    (['Phase 2 ·', 'Engage', 'production', 'rollout'],
+     'Full production build of Engage 2.0 — ingestion plus the data mapper and parser, in '
+     'production across FTM workflows; calendar/PMO deferred.',
+     ['3 months'], ['Fixed fee'], '$190K'),
+    (['Phase 3 ·', 'Delivery pod', '+ modules'],
+     'Standing team of four FTEs — 2 Solution Architects + 2 support — building platform '
+     'capability delivered as priced modules, at case speed, without waiting on a dev.',
+     ['ongoing'], ['Retainer · 12-', 'mo min'], '$100K/mo'),
+    (['What the', 'retainer buys'],
+     'Depending on module size and leverage — net of enablement, run-and-maintain, and the '
+     'discovery the pod also absorbs.',
+     ['≈ $1.2M/yr'], ['Pod capacity'], '3–5 modules/yr'),
+]
+
+
+def _rule(y, color, width=RULE_LW):
+    return [dict(id=None, kind='rect', x=a, y=y, w=b - a, h=width, fill=color)
+            for a, b in zip(COLS, COLS[1:])]
+
+
+def _wrap(font, text, size, width, arrow_font=None):
+    def length(s):
+        if arrow_font is None:
+            return font.text_length(s, size)
+        return sum((arrow_font if ch == '→' else font).text_length(ch, size) for ch in s)
+    lines, cur = [], ''
+    for word in text.split(' '):
+        trial = f'{cur} {word}'.strip()
+        if cur and length(trial) > width:
+            lines.append(cur)
+            cur = word
+        else:
+            cur = trial
+    lines.append(cur)
+    return lines
+
+
+def _centred(lines, top, bottom, lead):
+    """First baseline so a block of `lines` sits vertically centred in the row."""
+    centre = (top + bottom) / 2
+    return centre - (len(lines) - 1) * lead / 2 + VCENTRE
+
+
+def engagement_structure(page_no):
+    import pymupdf
+    ral = pymupdf.Font(fontfile=str(T.FONT_DIR / 'Raleway.ttf'))
+    arw = pymupdf.Font(fontfile=str(T.FONT_DIR / 'Arial.ttf'))
+
+    els = T.chrome(page_no, '08', 'ENGAGEMENT APPROACH · INDICATIVE STRUCTURE')
+    els += T.title(['Indicative engagement', 'structure.'])
+    els.append(dict(id='lede', kind='text', baseline=T.LEDE_BASE, x=T.MARGIN_L, font='Ral',
+                    weight=400, size=T.LEDE_SIZE, color=T.LEDE_COLOR,
+                    text='Each stage with its scope, duration, and commercial shape, as presented.'))
+
+    head = [('STAGE', STAGE_X), ('SCOPE & TEAM', SCOPE_X),
+            ('DURATION', DUR_X), ('COMMERCIAL', COMM_X)]
+    for i, (label, x) in enumerate(head):
+        els.append(dict(id=f'hd{i}', kind='text', text=label, font='Mont', weight=700,
+                        size=HEAD_SIZE, color=MUTED, baseline=208.69, x=x, ls=0.075))
+    for i, label in enumerate(('INDICATIVE', 'BUDGET')):
+        els.append(dict(id=f'hb{i}', kind='text', text=label, font='Mont', weight=700,
+                        size=HEAD_SIZE, color=MUTED, baseline=203.06 + i * 11.25,
+                        x=COMM_X, align='right', w=533.8 - COMM_X, ls=0.075))
+    els += _rule(HEAD_RULE_Y, RULE_HEAD)
+
+    top = HEAD_RULE_Y
+    for n, (stage, scope, dur, comm, budget) in enumerate(ROWS):
+        scope_lines = _wrap(ral, scope, CELL_SIZE, SCOPE_W, arw)
+        height = ROW_PAD_TOP + (len(scope_lines) - 1) * SCOPE_LEAD + ROW_PAD_BOT
+        bottom = top + height
+        for i, line in enumerate(scope_lines):
+            els.append(dict(id=f'sc{n}{i}', kind='text', text=line, font='Ral', stack=T.ARROW_STACK,
+                            fallback=True, weight=400, size=CELL_SIZE, color=NAVY,
+                            baseline=top + ROW_PAD_TOP + i * SCOPE_LEAD, x=SCOPE_X))
+        base = _centred(stage, top, bottom, STAGE_LEAD)
+        for i, line in enumerate(stage):
+            els.append(dict(id=f'st{n}{i}', kind='text', text=line, font='Mont', weight=700,
+                            size=STAGE_SIZE, color=NAVY, baseline=base + i * STAGE_LEAD, x=STAGE_X))
+        for key, lines, x in (('du', dur, DUR_X), ('co', comm, COMM_X)):
+            b = _centred(lines, top, bottom, SCOPE_LEAD)
+            for i, line in enumerate(lines):
+                els.append(dict(id=f'{key}{n}{i}', kind='text', text=line, font='Ral', weight=400,
+                                size=CELL_SIZE, color=NAVY, baseline=b + i * SCOPE_LEAD, x=x))
+        els.append(dict(id=f'bd{n}', kind='text', text=budget, font='Mont', weight=700,
+                        size=CELL_SIZE, color=NAVY,
+                        baseline=_centred([budget], top, bottom, SCOPE_LEAD),
+                        x=COMM_X, align='right', w=BUDGET_R - COMM_X))
+        top = bottom
+        els += _rule(bottom, RULE_LIGHT)
+
+    els.append(dict(id='cap', kind='text', font='Ral', style='italic', weight=400, size=8.6,
+                    color=MUTED, baseline=top + 18.83, x=T.MARGIN_L,
+                    text='Indicative budgets as presented; Phase 1 is the committed fixed fee.'))
+    print(f'    table ends {top:.1f}, caption {top + 18.83:.1f} (footer 811.5)')
+    return R.render(els, OUT / 'engagement_structure.pdf')
+
+
 if __name__ == '__main__':
     print(' ', m4_gate(18))
     print(' ', proposed_team(19))
     print(' ', pod_structure(20))
+    print(' ', engagement_structure(22))

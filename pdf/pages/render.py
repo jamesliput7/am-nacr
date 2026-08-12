@@ -31,7 +31,9 @@ FONT_FOR = {   # (family, weight, style) -> subset file
     ('Ral', 700, 'normal'): 'Raleway-Bold.ttf',
     ('Ral', 800, 'normal'): 'Raleway-Ultra-Bold.ttf',
     ('Ral', 400, 'italic'): 'Raleway-Oblique.ttf',
+    ('Arw', 400, 'normal'): 'Arial.ttf',
 }
+FALLBACK = 'Arial.ttf'      # only reached for glyphs the primary family lacks
 _cov = {}
 
 
@@ -52,7 +54,8 @@ def check_glyphs(elements):
             if fn is None:
                 problems.append(f"no subset for {el['font']} {weight} {style}")
                 continue
-            missing = sorted(set(text) - coverage(fn) - {'\n'})
+            allowed = coverage(fn) | (coverage(FALLBACK) if el.get('fallback') else set())
+            missing = sorted(set(text) - allowed - {'\n'})
             if missing:
                 problems.append(f"{el.get('id')}: {missing} missing from {fn} -- {text[:60]!r}")
     if problems:
@@ -113,7 +116,7 @@ def build_html(elements, adj_base, adj_ls):
             align = f"text-align:{el['align']};width:{el['w']}pt;" if 'align' in el else ''
             parts.append(
                 f"<div class='abs t' style=\"{_pos(el, adj_base.get(el.get('id'), 0))}"
-                f"font-family:{el['font']};font-weight:{el['weight']};"
+                f"font-family:{el.get('stack') or el['font']};font-weight:{el['weight']};"
                 f"font-style:{el.get('style', 'normal')};font-size:{el['size']}pt;"
                 f"color:{el['color']};letter-spacing:{ls}em;{align}\">"
                 f"{el['text']}</div>")
@@ -122,7 +125,7 @@ def build_html(elements, adj_base, adj_ls):
             inner = ''.join(f"<span style='font-weight:{w}'>{t}</span>" for t, w in runs)
             parts.append(
                 f"<div class='abs blk' style=\"{_pos(el, adj_base.get(el.get('id'), 0))}"
-                f"width:{el['w']}pt;font-family:{el['font']};font-weight:400;"
+                f"width:{el['w']}pt;font-family:{el.get('stack') or el['font']};font-weight:400;"
                 f"font-size:{el['size']}pt;color:{el['color']};"
                 f"line-height:{el['lead'] / el['size']:.5f};"
                 f"text-align:{el.get('align', 'left')}\">{inner}</div>")

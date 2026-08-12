@@ -82,6 +82,20 @@ def main(path):
     chk('no 13-week cash actuals anywhere',
         '13-Week' not in ''.join(p.get_text() for p in doc))
 
+    # page 22 - indicative engagement structure
+    chk('p22 Phase 1 scope reworded',
+        'reliefcalculationflow' in flat(21).replace('-', '')
+        and 'vendorandutilitiesmotions' in flat(21).lower())
+    chk('p22 drops the 6-to-4-weeks aside and the 13-week use case',
+        '6→4' not in flat(21) and '13-week' not in doc[21].get_text())
+    chk('p22 names the Phase 1 exit deliverables',
+        'updatedEngage2.0scope' in flat(21) and 'PlatformDevelopmentRoadmap' in flat(21))
+    chk('p22 keeps its four rows and their commercials',
+        all(v in doc[21].get_text() for v in ('$60K', '$190K', '$100K/mo', '3–5 modules/yr')))
+    chk('p22 table clears the footer', max(
+        ln['bbox'][3] for blk in doc[21].get_text('dict')['blocks']
+        for ln in blk.get('lines', []) if ln['bbox'][3] < 800) < 760)
+
     whole = ''.join(p.get_text() for p in doc)
     chk('misspelled names gone', 'Andrew Ku' not in whole and 'John Bain' not in whole)
     chk('no 13-week cash flow on the gate pages',
