@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Four unrelated fixes bundled into one pass because each is a small in-place edit:
 
-  p13  Phase 2 price badge and delivery-schedule narrative: fixed -> time & material
+  p13  Phase 2 price badge and delivery-schedule narrative: fixed -> time & material;
+       adds the $60K figure Phase 1's box left blank, next to the other two boxes' badges
   p21  Phase 2 budget-card chip, subline, and intro paragraph: fixed -> time & material;
        adds the $190K figure the card originally left blank, marked budgetary
   p25  IP Confirmation: drop the trailing "subject to legal review" sentence
@@ -121,6 +122,14 @@ def main(src, out):
     doc[PAGE].insert_text((231.5, 367.89), '$190K T&M', fontname='tmA13mb', fontfile=mub_f,
                           fontsize=9.5, color=(0x34 / 255, 0x42 / 255, 0xdc / 255))
 
+    # Phase 1's box left this same price line blank; the other two boxes both set it in
+    # Montserrat-Bold rather than the Ultra-Bold the rest of their type uses, because
+    # Ultra-Bold's subset has no '$' -- same reason applies here. White, not the royal
+    # blue the other two badges use: Phase 1's own box background IS that royal blue, so
+    # royal text on it would be invisible -- white matches the rest of this box's type.
+    doc[PAGE].insert_text((61.8, 378.10), '$60K', fontname='tmA13mb', fontfile=mub_f,
+                          fontsize=9.5, color=WHITE)
+
     NEW = ("Three phases, each de-risking the next. Phase 1 — Discovery + Build — is a firm $60K fixed fee "
            "committed now: four weeks that clear build scope and ship a working ingestion → mapping → forecast "
            "flow for Vendors and Utilities, on A&M’s own files. Phase 2 puts Engage 2.0 into production — "
@@ -133,7 +142,7 @@ def main(src, out):
     clear(doc[PAGE], 51.0, 165.0, 544.3, 258.0)
     doc[PAGE].apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
     set_lines(doc[PAGE], lines, 51.0, 171.65, 16.12, 10.4, SLATE, 'tmA13ral', ral_f, arw_f)
-    print(f'  p13: badge + {len(lines)}-line narrative (was 6)')
+    print(f'  p13: $60K + $190K T&M badges + {len(lines)}-line narrative (was 6)')
 
     # ---- page 21: Phase 2 budget card + intro paragraph ----------------------
     PAGE = 20
@@ -246,6 +255,7 @@ def main(src, out):
     flat = lambda i: ''.join(check[i].get_text().split())
     assert 'fixed' not in check[12].get_text().lower().replace('fixed fee', '').replace('a firm $60k fixed fee', '') or True
     assert '$190KT&M' in flat(12), 'p13 badge not updated'
+    assert '$60K' in check[12].get_text(), 'p13 Phase 1 badge missing'
     assert 'time-and-materialsbasis' in flat(12), 'p13 narrative not updated'
     assert 'PHASE2·TIME&MATERIAL' in flat(20).upper(), 'p21 chip not updated'
     assert '$190K' in check[20].get_text(), 'p21 budget figure missing'

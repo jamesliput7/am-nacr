@@ -137,6 +137,7 @@ def main(path):
 
     # page 13, 21 - Phase 2 fixed fee -> time & material
     chk('p13 price badge is time & material', '$190KT&M' in flat(12) and '$190Kfixed' not in flat(12))
+    chk('p13 Phase 1 box shows $60K like the other two boxes', '$60K' in doc[12].get_text())
     chk('p13 narrative reworded', 'time-and-materialsbasis,$190Kbudgetary' in flat(12))
     chk('p21 chip is time & material', 'PHASE2·TIME&MATERIAL' in flat(20).upper()
         and 'PHASE2·FIXEDFEE' not in flat(20).upper())
