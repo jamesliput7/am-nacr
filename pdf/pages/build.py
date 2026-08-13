@@ -195,7 +195,7 @@ def pod_structure(page_no):
          ('Delivery Manager', 'TBD', MUTED)], 'L')
     right, bot_r = pod_col(
         T.COL_R_L, T.CARD_R, top, NAVY, 'PHASE 2 · ENGAGE ROLLOUT',
-        '3 MONTHS · $190K FIXED · 6 ROLES',
+        '3 MONTHS · $190K BUDGETARY · 6 ROLES',
         [('Solution Architect', 'Carried over · Ruben Carrera', GREEN),
          ('Technical Architect', 'Carried over · Andros Haggins', GREEN),
          ('Delivery Manager', 'Carried over', GREEN),
@@ -248,7 +248,7 @@ ROWS = [
     (['Phase 2 ·', 'Engage', 'production', 'rollout'],
      'Full production build of Engage 2.0 — ingestion plus the data mapper and parser, in '
      'production across FTM workflows; calendar/PMO deferred.',
-     ['3 months'], ['Fixed fee'], '$190K'),
+     ['3 months'], ['Time & Material'], '$190K'),
     (['Phase 3 ·', 'Delivery pod', '+ modules'],
      'Standing team of four FTEs — 2 Solution Architects + 2 support — building platform '
      'capability delivered as priced modules, at case speed, without waiting on a dev.',

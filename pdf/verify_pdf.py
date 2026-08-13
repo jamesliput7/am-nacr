@@ -133,6 +133,39 @@ def main(path):
     whole = ''.join(p.get_text() for p in doc)
     chk('misspelled names gone', 'Andrew Ku' not in whole and 'John Bain' not in whole)
 
+    # page 13, 21 - Phase 2 fixed fee -> time & material
+    chk('p13 price badge is time & material', '$190KT&M' in flat(12) and '$190Kfixed' not in flat(12))
+    chk('p13 narrative reworded', 'time-and-materialsbasis,$190Kbudgetary' in flat(12))
+    chk('p21 chip is time & material', 'PHASE2·TIME&MATERIAL' in flat(20).upper()
+        and 'PHASE2·FIXEDFEE' not in flat(20).upper())
+    chk('p21 subline is time & material', '3months·time&material' in flat(20))
+    chk('p21 intro reworded', 'time-and-materialsrolloutputsEngage2.0intoproduction' in flat(20))
+
+    # page 20 - pod structure budgetary label
+    chk('p20 pod meta reads budgetary', '$190kbudgetary' in flat(19).lower()
+        and '$190kfixed' not in flat(19).lower())
+
+    # page 22 - engagement structure Phase 2 commercial label
+    chk('p22 Phase 2 commercial reads time & material', 'Time&Material' in flat(21)
+        and flat(21).count('Fixedfee') == 1)
+
+    # no stray "fixed fee" / "fixed amount" left describing Phase 2 anywhere
+    chk('no "fixed fee" tied to Phase 2 survives', 'PHASE2·FIXEDFEE' not in whole.upper()
+        and 'Phase2·Fixedfee' not in whole.replace(' ', ''))
+
+    # page 25 - IP Confirmation trailing sentence removed
+    chk('p25 drops the legal-review sentence',
+        'subjecttolegalreviewofthedefinitiveagreementlanguage' not in flat(24).lower())
+    chk('p25 IP Confirmation section still intact',
+        'IPCONFIRMATION' in flat(24).upper() and 'A&M\'ssoleproperty' in flat(24).replace(' ', '').replace('’', "'"))
+
+    # page 28 - Ruben Carrera -> Steve Smith (this page only)
+    chk('p28 closing contact is Steve Smith',
+        'SteveSmith·EngagementLead·stevesmith@nymbl.app' in flat(27)
+        and 'RubenCarrera' not in flat(27))
+    chk('Ruben Carrera survives elsewhere (only p28 changed)',
+        whole.count('Ruben Carrera') >= 1)
+
     for label, passed in results:
         print(('  PASS  ' if passed else '  FAIL  ') + label)
     failed = [l for l, p in results if not p]
