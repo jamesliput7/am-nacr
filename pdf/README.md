@@ -18,11 +18,12 @@ source was not available, so changes are made two ways:
   price badge and delivery-schedule narrative, p21's budget-card chip/subline/intro
   (with the chip's letter-spacing measured and replayed glyph by glyph, since
   `insert_text` has no `char_spacing` argument), p25's IP Confirmation paragraph
-  (dropped a trailing sentence, reflowed 9 lines to 8), and p28's closing contact
-  line (`Ruben Carrera` → `Steve Smith`, on that page only — set in Raleway rather
-  than the page's own Montserrat, which has no capital `S` anywhere in its subset).
-  Every one of these is pre-checked to wrap to no more lines than the text it
-  replaces, so nothing below or beside it has to move.
+  (dropped a trailing sentence, reflowed 9 lines to 8), and the closing page's
+  contact line (`Ruben Carrera` → `Steve Smith`, on that page only — set in Raleway
+  rather than the page's own Montserrat, which has no capital `S` anywhere in its
+  subset; this was page 28 at the time, before the reference page below pushed it
+  to 29). Every one of these is pre-checked to wrap to no more lines than the text
+  it replaces, so nothing below or beside it has to move.
 - **Raster patches**, for the two mentions baked into a diagram image rather than
   live text: `fix_gate_diagrams.py` renders a small transparent-background SVG
   containing just the replaced element (a whole box for p16, a title-sized cover rect
@@ -32,10 +33,19 @@ source was not available, so changes are made two ways:
   pages in WeasyPrint 69.0 (same engine, same fonts, metrics measured off the
   document). `splice.py` inserts new pages, then fixes footer numbers, contents
   references and bookmarks; `replace_page.py` swaps one page for another of the same
-  size, leaving numbering alone.
+  size, leaving numbering alone; `add_reference_page.py` appends
+  `pages/build.py::additional_experience()` — two more reference cards (Houlihan
+  Lokey, eCapital) whose copy ran to 13-14 lines at page 27's own card width, too
+  long for the two shortest rows there, so they get their own page (28) right after
+  it. Because it lands at the very end of the content, only the closing page shifts
+  (28 → 29), and since that page turned out to carry no visible footer number at all,
+  the insertion needed no renumbering — the simplest of the three insertion scripts.
+  `template.card()` grew an optional `radius` for this page, to match page 27's
+  rounded corners instead of the square ones pages 18-22 use.
 
 Deleting or replacing a page orphans its bookmark and any link that targeted it, so
-both scripts capture the outline first and repoint dead links afterwards.
+all three scripts capture the outline first (and `splice.py`/`replace_page.py`
+repoint dead links afterwards).
 
 `pages/fonts/` holds the font subsets extracted from the PDF. They cover only the
 glyphs the document already uses, so `pages/render.py` refuses to render text with a
@@ -53,6 +63,11 @@ font's subset render as null glyphs, with no error. Every `fontname=` alias used
 a given page across this whole pipeline's history must be unique — check what
 `add_gate_m4.py`, `fix_13week_phrase.py` and `fix_time_and_material.py` already used
 on pages 13/14/21 before adding a new script that touches them.
+
+`pages/assets/logo_houlihan_lokey.png` and `logo_ecapital.png` are the two logos
+supplied for the page 28 reference cards, autocropped to content and matted to
+transparent (alpha = 255 − min(R,G,B), the standard trick for a solid-white-background
+logo) so they sit cleanly on the card's white background regardless of size.
 
 ## Status
 

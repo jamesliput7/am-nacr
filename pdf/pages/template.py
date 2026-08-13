@@ -118,6 +118,11 @@ def title(lines):
             for i, t in enumerate(lines)]
 
 
-def card(x0, x1, y0, y1, accent):
-    """White card with a hairline border and a coloured top edge."""
-    return dict(id=None, kind='card', x=x0, y=y0, w=x1 - x0, h=y1 - y0, accent=accent)
+def card(x0, x1, y0, y1, accent, radius=0):
+    """White card with a hairline border and a coloured top edge.
+
+    `radius` is 0 (square corners, pages 18-22) unless a page needs the rounded
+    corners the original page 27 reference cards use.
+    """
+    return dict(id=None, kind='card', x=x0, y=y0, w=x1 - x0, h=y1 - y0, accent=accent,
+                radius=radius)

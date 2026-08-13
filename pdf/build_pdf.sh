@@ -12,6 +12,8 @@
 #   9 gate diagrams pages 16, 17 - the same two mentions, baked into the gate-diagram rasters
 #  10 time & material pages 13, 21, 25, 28 - Phase 2 fixed fee -> time & material ($190K budgetary),
 #                     IP Confirmation trailing sentence removed, Ruben Carrera -> Steve Smith (p28 only)
+#  11 reference page  new page 28 - two more reference cards (Houlihan Lokey, eCapital) that didn't
+#                     fit on page 27; closing page becomes 29
 #
 # Needs: pymupdf, weasyprint, fonttools.
 set -e
@@ -25,6 +27,7 @@ python3 update_module_row.py build/stage4.pdf build/stage5.pdf
 python3 fix_13week_phrase.py build/stage5.pdf build/stage6.pdf
 python3 fix_gate_wording.py build/stage6.pdf build/stage7.pdf
 python3 fix_gate_diagrams.py build/stage7.pdf build/stage8.pdf
-python3 fix_time_and_material.py build/stage8.pdf Nymbl_AM_NACR.pdf
-rm -f build/stage1.pdf build/stage2.pdf build/stage3.pdf build/stage4.pdf build/stage5.pdf build/stage6.pdf build/stage7.pdf build/stage8.pdf
+python3 fix_time_and_material.py build/stage8.pdf build/stage9.pdf
+python3 add_reference_page.py build/stage9.pdf Nymbl_AM_NACR.pdf
+rm -f build/stage1.pdf build/stage2.pdf build/stage3.pdf build/stage4.pdf build/stage5.pdf build/stage6.pdf build/stage7.pdf build/stage8.pdf build/stage9.pdf
 echo "built Nymbl_AM_NACR.pdf"

@@ -102,9 +102,10 @@ def build_html(elements, adj_base, adj_ls):
             parts.append(f"<div class=abs style=\"left:{el['x']}pt;top:{el['y']}pt;"
                          f"width:{el['w']}pt;height:{el['h']}pt;background:{el['fill']}\"></div>")
         elif k == 'card':
+            radius = f"border-radius:{el['radius']}pt;" if el.get('radius') else ''
             parts.append(
                 f"<div class=abs style=\"left:{el['x']}pt;top:{el['y']}pt;width:{el['w']}pt;"
-                f"height:{el['h']}pt;background:{T.CARD_BG};box-sizing:border-box;"
+                f"height:{el['h']}pt;background:{T.CARD_BG};box-sizing:border-box;{radius}"
                 f"border:0.75pt solid {T.CARD_BORDER};border-top:2pt solid {el['accent']}\"></div>")
         elif k == 'img':
             src = T.data_uri(T.FONT_DIR.parent / 'assets' / (el['src'] + '.png'))

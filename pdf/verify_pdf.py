@@ -28,7 +28,7 @@ def main(path):
     def chk(label, cond):
         results.append((label, bool(cond)))
 
-    chk('28 pages', doc.page_count == 28)
+    chk('29 pages', doc.page_count == 29)
 
     feet = []
     for page in doc:
@@ -38,7 +38,7 @@ def main(path):
         feet.append(nums[0] if nums else None)
     chk('footer numbers match their position',
         feet[0] is None and feet[-1] is None
-        and all(feet[i] == str(i + 1) for i in range(1, 27)))
+        and all(feet[i] == str(i + 1) for i in range(1, 28)))
     chk('contents references updated',
         [s['text'] for blk in doc[1].get_text('dict')['blocks'] for ln in blk.get('lines', [])
          for s in ln['spans'] if s['bbox'][2] > 520 and s['size'] > 9]
@@ -47,6 +47,8 @@ def main(path):
     chk('bookmarks for both new pages',
         {('Scope and roadmap, refreshed.', 18), ('The pod, carried into Phase 2.', 20)}
         <= {(t, p) for _, t, p in doc.get_toc()})
+    chk('bookmark for the new reference page',
+        ('More cleared, on-point proof.', 28) in {(t, p) for _, t, p in doc.get_toc()})
     chk('no dead links', not [l for pg in doc for l in pg.get_links() if l.get('page', 0) < 0])
 
     # page 13/14 - the fourth gate
@@ -159,12 +161,22 @@ def main(path):
     chk('p25 IP Confirmation section still intact',
         'IPCONFIRMATION' in flat(24).upper() and 'A&M\'ssoleproperty' in flat(24).replace(' ', '').replace('’', "'"))
 
-    # page 28 - Ruben Carrera -> Steve Smith (this page only)
-    chk('p28 closing contact is Steve Smith',
-        'SteveSmith·EngagementLead·stevesmith@nymbl.app' in flat(27)
-        and 'RubenCarrera' not in flat(27))
-    chk('Ruben Carrera survives elsewhere (only p28 changed)',
+    # page 29 (was 28) - Ruben Carrera -> Steve Smith (this page only)
+    chk('p29 closing contact is Steve Smith',
+        'SteveSmith·EngagementLead·stevesmith@nymbl.app' in flat(28)
+        and 'RubenCarrera' not in flat(28))
+    chk('Ruben Carrera survives elsewhere (only the closing page changed)',
         whole.count('Ruben Carrera') >= 1)
+
+    # page 28 - new reference cards (Houlihan Lokey, eCapital)
+    chk('p28 has both new reference cards',
+        'HOULIHANLOKEY' in flat(27).upper() and 'ECAPITAL' in flat(27).upper())
+    chk('p28 cards carry the client-provided copy',
+        'nativeiOSmobileCRMforHoulihanLokey' in flat(27)
+        and 'embeddedproductandengineeringpartner' in flat(27))
+    chk('p28 clears the footer', max(
+        ln['bbox'][3] for blk in doc[27].get_text('dict')['blocks']
+        for ln in blk.get('lines', []) if ln['bbox'][3] < 800) < 800)
 
     for label, passed in results:
         print(('  PASS  ' if passed else '  FAIL  ') + label)

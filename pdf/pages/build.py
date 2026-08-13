@@ -342,8 +342,68 @@ def engagement_structure(page_no):
     return R.render(els, OUT / 'engagement_structure.pdf')
 
 
+# ══ page E · Additional reference cards (new page after "Cleared, on-point proof.") ═
+REF_IMG_TOP_DY, REF_IMG_ROW_H = 24.0, 34.0
+REF_EYEBROW_DY = REF_IMG_TOP_DY + REF_IMG_ROW_H + 16.0
+REF_BODY_START_DY, REF_BODY_LEAD = REF_EYEBROW_DY + 16.0, 12.6
+REF_CARD_H = 290.0
+
+
+def ref_card(x0, x1, top, accent, logo_src, logo_ar, logo_h, eyebrow, body, idx):
+    w = x1 - x0
+    img_w = logo_h * logo_ar
+    img_y = top + REF_IMG_TOP_DY + (REF_IMG_ROW_H - logo_h) / 2
+    x = x0 + T.CARD_PAD_L
+    return [
+        T.card(x0, x1, top, top + REF_CARD_H, accent, radius=9.0),
+        dict(id=None, kind='img', src=logo_src, x=x0 + (w - img_w) / 2, y=img_y,
+             w=img_w, h=logo_h),
+        dict(id=f'reb{idx}', kind='text', text=eyebrow, font='Mont', weight=700, size=7.8,
+             color=accent, baseline=top + REF_EYEBROW_DY, x=x, ls=0.03),
+        dict(id=f'rebody{idx}', kind='para', text=body, font='Ral', size=8.7,
+             color=T.BIO_COLOR, baseline=top + REF_BODY_START_DY, x=x,
+             w=w - 2 * T.CARD_PAD_L, lead=REF_BODY_LEAD),
+    ]
+
+
+def additional_experience(page_no):
+    els = T.chrome(page_no, '12', 'RELEVANT EXPERIENCE')
+    els += T.title(['More cleared,', 'on-point proof.'])
+    els.append(dict(id='lede', kind='text', baseline=T.LEDE_BASE, x=T.MARGIN_L, font='Ral',
+                    weight=400, size=T.LEDE_SIZE, color=T.LEDE_COLOR,
+                    text='Two more engagements squarely on point: AI-accelerated speed and '
+                         'embedded delivery.'))
+
+    top = 204.5
+    els += ref_card(
+        T.CARD_L, T.COL_L_R, top, ROYAL, 'logo_houlihan_lokey', 1012 / 182, 22.0,
+        'HOULIHAN LOKEY · MOBILE CRM, AI-ACCELERATED',
+        'Nymbl designed and delivered a native iOS mobile CRM for Houlihan Lokey, extending '
+        'the firm’s HLOS platform into a mobile-first experience purpose-built for '
+        'investment bankers on the move — giving them instant access to relationship '
+        'data, meeting prep, and account intelligence between client meetings. Using an '
+        'AI-accelerated design and development approach (Figma with MCP and GitHub '
+        'integration), Nymbl took the app from concept to internal App Store launch in two '
+        'to three months, where it now supports 400+ active users, with an ongoing roadmap '
+        'bringing additional desktop CRM capabilities into the mobile experience.', 'hl')
+    els += ref_card(
+        T.COL_R_L, T.CARD_R, top, TEAL, 'logo_ecapital', 92 / 120, 30.0,
+        'ECAPITAL · EMBEDDED PRODUCT & ENGINEERING PARTNER',
+        'Nymbl operates as eCapital’s embedded product and engineering partner across '
+        'the suite of applications that run its entire asset-based lending operation — '
+        'from funding requests and underwriting through monthly reporting and loan servicing '
+        '— delivering new feature sets, major platform upgrades, and extended-hours '
+        'application support with defined response SLAs. Nymbl is now leading eCapital’s '
+        'modernization program, replatforming the client-facing Borrower Portal onto a modern '
+        'full-stack frontend and API layer without disrupting the interconnected systems '
+        'behind it, establishing a reusable foundation for further modernization across the '
+        'platform.', 'ec')
+    return R.render(els, OUT / 'additional_experience.pdf')
+
+
 if __name__ == '__main__':
     print(' ', m4_gate(18))
     print(' ', proposed_team(19))
     print(' ', pod_structure(20))
     print(' ', engagement_structure(22))
+    print(' ', additional_experience(28))
