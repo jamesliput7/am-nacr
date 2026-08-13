@@ -344,26 +344,32 @@ def engagement_structure(page_no):
 
 # ══ page E · Additional reference cards (new page after "Cleared, on-point proof.") ═
 REF_IMG_TOP_DY, REF_IMG_ROW_H = 24.0, 34.0
-REF_EYEBROW_DY = REF_IMG_TOP_DY + REF_IMG_ROW_H + 16.0
-REF_BODY_START_DY, REF_BODY_LEAD = REF_EYEBROW_DY + 16.0, 12.6
+REF_EYEBROW_DY, REF_EYEBROW_LEAD = REF_IMG_TOP_DY + REF_IMG_ROW_H + 16.0, 11.7
+REF_BODY_GAP, REF_BODY_LEAD = 16.0, 12.6
 REF_CARD_H = 290.0
 
 
 def ref_card(x0, x1, top, accent, logo_src, logo_ar, logo_h, eyebrow, body, idx):
+    """`eyebrow` is a list of lines -- one for a short label, two when it doesn't fit
+    the column on one line (as on the source page 27 cards, e.g. the Kraft Group's)."""
     w = x1 - x0
     img_w = logo_h * logo_ar
     img_y = top + REF_IMG_TOP_DY + (REF_IMG_ROW_H - logo_h) / 2
     x = x0 + T.CARD_PAD_L
-    return [
+    body_start_dy = REF_EYEBROW_DY + (len(eyebrow) - 1) * REF_EYEBROW_LEAD + REF_BODY_GAP
+    els = [
         T.card(x0, x1, top, top + REF_CARD_H, accent, radius=9.0),
         dict(id=None, kind='img', src=logo_src, x=x0 + (w - img_w) / 2, y=img_y,
              w=img_w, h=logo_h),
-        dict(id=f'reb{idx}', kind='text', text=eyebrow, font='Mont', weight=700, size=7.8,
-             color=accent, baseline=top + REF_EYEBROW_DY, x=x, ls=0.03),
-        dict(id=f'rebody{idx}', kind='para', text=body, font='Ral', size=8.7,
-             color=T.BIO_COLOR, baseline=top + REF_BODY_START_DY, x=x,
-             w=w - 2 * T.CARD_PAD_L, lead=REF_BODY_LEAD),
     ]
+    for i, line in enumerate(eyebrow):
+        els.append(dict(id=f'reb{idx}{i}', kind='text', text=line, font='Mont', weight=700,
+                        size=7.8, color=accent, baseline=top + REF_EYEBROW_DY + i * REF_EYEBROW_LEAD,
+                        x=x, ls=0.03))
+    els.append(dict(id=f'rebody{idx}', kind='para', text=body, font='Ral', size=8.7,
+                    color=T.BIO_COLOR, baseline=top + body_start_dy, x=x,
+                    w=w - 2 * T.CARD_PAD_L, lead=REF_BODY_LEAD))
+    return els
 
 
 def additional_experience(page_no):
@@ -377,7 +383,7 @@ def additional_experience(page_no):
     top = 204.5
     els += ref_card(
         T.CARD_L, T.COL_L_R, top, ROYAL, 'logo_houlihan_lokey', 1012 / 182, 22.0,
-        'HOULIHAN LOKEY · MOBILE CRM, AI-ACCELERATED',
+        ['HOULIHAN LOKEY · MOBILE CRM, AI-ACCELERATED'],
         'Nymbl designed and delivered a native iOS mobile CRM for Houlihan Lokey, extending '
         'the firm’s HLOS platform into a mobile-first experience purpose-built for '
         'investment bankers on the move — giving them instant access to relationship '
@@ -388,7 +394,7 @@ def additional_experience(page_no):
         'bringing additional desktop CRM capabilities into the mobile experience.', 'hl')
     els += ref_card(
         T.COL_R_L, T.CARD_R, top, TEAL, 'logo_ecapital', 92 / 120, 30.0,
-        'ECAPITAL · EMBEDDED PRODUCT & ENGINEERING PARTNER',
+        ['ECAPITAL · EMBEDDED PRODUCT &', 'ENGINEERING PARTNER'],
         'Nymbl operates as eCapital’s embedded product and engineering partner across '
         'the suite of applications that run its entire asset-based lending operation — '
         'from funding requests and underwriting through monthly reporting and loan servicing '

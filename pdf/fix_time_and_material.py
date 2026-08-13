@@ -2,7 +2,8 @@
 """Four unrelated fixes bundled into one pass because each is a small in-place edit:
 
   p13  Phase 2 price badge and delivery-schedule narrative: fixed -> time & material
-  p21  Phase 2 budget-card chip, subline, and intro paragraph: fixed -> time & material
+  p21  Phase 2 budget-card chip, subline, and intro paragraph: fixed -> time & material;
+       adds the $190K figure the card originally left blank, marked budgetary
   p25  IP Confirmation: drop the trailing "subject to legal review" sentence
   p28  closing contact: Ruben Carrera -> Steve Smith (this page only)
 
@@ -139,10 +140,12 @@ def main(src, out):
     ral_buf = font(doc, 'TXDVQZ+Raleway', PAGE)
     mb_buf = font(doc, 'LZJCGO+Montserrat-Bold', PAGE)
     arw_buf = font(doc, 'HHHHIV+Arial', PAGE)
+    heavy_buf = font(doc, 'WQWKRW+Raleway-Heavy', PAGE)
     ral, mb, arw = pymupdf.Font(fontbuffer=ral_buf), pymupdf.Font(fontbuffer=mb_buf), \
         pymupdf.Font(fontbuffer=arw_buf)
     ral_f, mb_f, arw_f = stash(ral_buf, '.p21ral.ttf'), stash(mb_buf, '.p21mb.ttf'), \
         stash(arw_buf, '.p21arw.ttf')
+    heavy_f = stash(heavy_buf, '.p21heavy.ttf')
 
     chip = 'PHASE 2 · TIME & MATERIAL'
     LS = 0.09663889341884177
@@ -156,12 +159,20 @@ def main(src, out):
     if 236.1 + chip_w > 375.2:
         sys.exit(f'p21 chip overflows the card: ends at {236.1 + chip_w:.1f}, card edge 375.2')
 
-    sub = '3 months · time & material'
+    sub = '3 months · budgetary'
     clear(doc[PAGE], 236.1, 346.0, 375.2, 361.0)
     doc[PAGE].apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
     doc[PAGE].insert_text((236.1, 358.60), sub, fontname='tmA21ral', fontfile=ral_f, fontsize=8.5, color=WHITE)
     if 236.1 + ral.text_length(sub, 8.5) > 375.2:
         sys.exit('p21 subline overflows the card')
+
+    # the other two phase cards show a firm number ($60K, $100K/mo); Phase 2's own number
+    # is budgetary rather than fixed, so it gets the same big-number treatment plus the
+    # subline above, instead of the blank space the card originally had here. Inserted
+    # after both redactions above -- its glyphs' descenders reach into the subline's
+    # clear rect, and an apply_redactions after this insert would delete it wholesale.
+    doc[PAGE].insert_text((236.0997, 341.8134), '$190K', fontname='tmA21heavy', fontfile=heavy_f,
+                          fontsize=30.0, color=WHITE)
 
     NEW = ("A four-week Discovery + Build proves the workflow on your files for a fixed $60K; "
            "a time-and-materials rollout puts Engage 2.0 into production; a standing delivery pod then "
@@ -173,7 +184,7 @@ def main(src, out):
     clear(doc[PAGE], 51.0, 165.0, 544.3, 232.0)
     doc[PAGE].apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_NONE)
     set_lines(doc[PAGE], lines, 51.0, 168.90, 17.82, 11.5, SLATE, 'tmA21ral2', ral_f)
-    print(f'  p21: chip + subline + {len(lines)}-line intro (was 4)')
+    print(f'  p21: chip + $190K figure + subline + {len(lines)}-line intro (was 4)')
 
     # ---- page 25: IP Confirmation, drop the trailing sentence ----------------
     PAGE = 24
@@ -237,7 +248,8 @@ def main(src, out):
     assert '$190KT&M' in flat(12), 'p13 badge not updated'
     assert 'time-and-materialsbasis' in flat(12), 'p13 narrative not updated'
     assert 'PHASE2·TIME&MATERIAL' in flat(20).upper(), 'p21 chip not updated'
-    assert '3months·time&material' in flat(20), 'p21 subline not updated'
+    assert '$190K' in check[20].get_text(), 'p21 budget figure missing'
+    assert '3months·budgetary' in flat(20), 'p21 subline not updated'
     assert 'time-and-materialsrollout' in flat(20), 'p21 intro not updated'
     assert 'legalreview' not in flat(24).lower(), 'p25 sentence still present'
     assert 'embeddedinthedeliveredworkproduct.' in flat(24), 'p25 paragraph truncated wrong'

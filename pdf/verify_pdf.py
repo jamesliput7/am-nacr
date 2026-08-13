@@ -140,7 +140,8 @@ def main(path):
     chk('p13 narrative reworded', 'time-and-materialsbasis,$190Kbudgetary' in flat(12))
     chk('p21 chip is time & material', 'PHASE2·TIME&MATERIAL' in flat(20).upper()
         and 'PHASE2·FIXEDFEE' not in flat(20).upper())
-    chk('p21 subline is time & material', '3months·time&material' in flat(20))
+    chk('p21 subline reads budgetary', '3months·budgetary' in flat(20))
+    chk('p21 shows the $190K figure, marked budgetary not fixed', '$190K' in doc[20].get_text())
     chk('p21 intro reworded', 'time-and-materialsrolloutputsEngage2.0intoproduction' in flat(20))
 
     # page 20 - pod structure budgetary label
